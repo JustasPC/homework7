@@ -18,27 +18,33 @@ def getScores():
     return scores
 
 
-def addScore(score,name,secret_number):
+def addScore(score,name,secret_number,wrong_g):
     score_date = str(datetime.datetime.now())
 
     score_record = {
         "name":name,
         "number":secret_number,
         "date":score_date,
-        "attemps":score
+        "attemps":score,
+        "wrong_guesses":wrong_g,
     }
     scores = getScores()
     scores.append(score_record)
     data = json.dumps(scores)
     writeFile('highscore.txt', data)
 
-scores = getScores()
+def takenGuess(elem):
+    return elem["attemps"]
 
+scores = getScores()
+scores.sort(key=takenGuess)
+
+wrong_guess=[]
 place = 1
 print("Sveiki, top rezultatai yra: ")
-print("* VIETA**BANDYMAI********DATA*****************_NAME_***Sectret_number__")
+print("* VIETA**BANDYMAI********DATA*****************_NAME_***Sectret_number**")
 for score in scores[:3]:
-    print(str(place),"vieta**",score["attemps"],"     *",score["date"],score["name"],'**', score["number"])
+    print(str(place),"vieta**",score["attemps"],"     *",score["date"],score["name"],'**', score["number"], ' Taip pat bandyta speti:',score["wrong_guesses"])
     #print(score["date"])
     #print(score["attemps"])
     place+=1
@@ -72,10 +78,11 @@ while skaicius != paskutinis_spejimas:
     if checkNumber(guess, skaicius):
         print("Congratulations")
     else:
+        wrong_guess.append(guess)
         print("Try again")
     paskutinis_spejimas = guess
 
-addScore(turn,name, skaicius)
+addScore(turn,name, skaicius,wrong_guess)
 
 print("Zaidimas baigtas, pabaiga cia")
 print("Atspeti tau uztruko " + str(turn) + " spejimus")
